@@ -15,6 +15,9 @@ helm upgrade -i my-ing ingress-nginx/ingress-nginx \
     --set-string controller.podAnnotations."prometheus\.io/scrape"="true" \
     --set-string controller.podAnnotations."prometheus\.io/port"="10254"
 
+# make sure ingress sevice monitor is enabled
+kubectl apply -f manifests/ingress-service-monitor.yaml
+
 echo "*** Kubernetes Ingress controller Installed ****"
 echo "Kubernetes Ingress controller Documentation: https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx"
 #------------------------------------------------------------------------------------

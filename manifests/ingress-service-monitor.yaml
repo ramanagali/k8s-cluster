@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    meta.helm.sh/release-name: my-ing
+    meta.helm.sh/release-namespace: default
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: my-ing
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    release: prometheus
+  name: my-ing-ingress-nginx-controller
+  namespace: default
+spec:
+  endpoints:
+    - interval: 30s
+      port: metrics
+  namespaceSelector:
+    matchNames:
+      - default
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/instance: my-ing
+      app.kubernetes.io/name: ingress-nginx

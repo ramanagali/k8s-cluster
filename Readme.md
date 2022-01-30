@@ -23,7 +23,7 @@
   * https://github.com/wg/wrk
 
 ### 2. Mandatory Step for MacOS Montereyclea
-run below...
+Bun below...
 ```sh
 sudo mkdir -p /etc/vbox/
 echo * 0.0.0.0/0 ::/0 | sudo tee -a /etc/vbox/networks.conf
@@ -83,33 +83,37 @@ Total HTTP Load test - duration is 30 seconds for each service
 ```
 
 #### 8.1 Queries Timeseries data to CSV
+Run Below commands in Prom server
+
+```
+PROM_URL=http://$NODE_IP:$PROM_PORT:9090   
+echo $PROM_URL
+```
 
 1. Average requests per second 
-```sh
-rate(http_requests_total[1s]) (rate averaged per second)
-rate(http_requests_total[5m]) * 60 (minute rate averaged over 5 minutes)
-avg_over_time(sum(rate(http_request_counter[1s])) by (method, some_other_label)[1d])
-```
+`avg(rate(nginx_ingress_controller_nginx_process_requests_total[4h]))`
+
 2. Average memory usage per second
-`rate(process_resident_memory_bytes[1s])`
+`avg(rate(process_resident_memory_bytes{service="my-ing-ingress-nginx-controller-metrics"}[4h]))`
 
 3. Average CPU usage per second
-`rate(process_cpu_seconds_total[1s])`
+`avg(rate(process_cpu_seconds_total{service="my-ing-ingress-nginx-controller-metrics"}[4h]))`
 
-4. Average Throughput per second
-`rate(sample_app_histogram_request_duration_seconds_count[1s])`
-
-5. Number of Requests per minute
-`sum(increase(sample_app_histogram_request_duration_seconds_count[1m])) by (job)`
-
-<!-- echo "http://$NODE_IP:$PROM_PORT/api/v1/query?query=cpu[1h]" -->
-
-https://prometheus.io/docs/prometheus/latest/querying/examples/\
-https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors
-https://www.robustperception.io/prometheus-query-results-as-csv
-https://prometheus.io/docs/prometheus/latest/querying/api/#instant-queries
 
 #### 8.2 Export Timeseries data to CSV
+```
+PROM_URL=http://$NODE_IP:$PROM_PORT:9090   
+echo $PROM_URL
+```
+1. Average requests per second 
+`curl -fs --data-urlencode 'query=avg(rate(nginx_ingress_controller_nginx_process_requests_total[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[] | .value[1]' > avg_req_ps.csv`
+
+2. Average memory usage per second
+`curl -fs --data-urlencode 'query=avg(rate(process_resident_memory_bytes{service="my-ing-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]'  > avg_mem_ps.csv`
+
+3. Average CPU usage per second
+`curl -fs --data-urlencode 'query=avg(rate(process_cpu_seconds_total{service="my-ing-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]' > > avg_cpu_ps.csv`
+
 
 #### 9. Stop k8s cluster
 
