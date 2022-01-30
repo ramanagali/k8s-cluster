@@ -1,4 +1,4 @@
-## Kubernetes Cluster with Ingress, Prometheus Monitoring and Measure Benchmarking
+# Kubernetes Cluster with Ingress, Prometheus Monitoring and Measure Benchmarking
 1. Spin up a multi-node Kubernetes cluster using vagrant 
 2. Install and run the NGINX ingress controller.
 3. Install and run Prometheus, and configure it to monitor the Ingress Controller pods and Ingress resources created by the controller.
@@ -9,8 +9,8 @@
    * Average memory usage per second
    * Average CPU usage per second
 
-### Create Multi Node K8S cluster using Vagrant & VirtualBox
-#### 1. Mandatory Prerequisites
+## Create Multi Node K8S cluster using Vagrant & VirtualBox
+### 1. Prerequisites (Mandatory)
 * Install Brew using https://brew.sh/
 * Install virutalbox using `brew install --cask virtualbox`         
   * follow steps https://www.virtualbox.org/wiki/Downloads
@@ -21,32 +21,42 @@
 * Install Go using https://go.dev/doc/install
 * Install wrk http benchmarking tools using `brew install wrk`
   * https://github.com/wg/wrk
-* Clone the repo using `git clone the repo https://github.com/ramanagali/k8s-cluster-podman.git`
-* cd k8s-cluster-prometheus
-* git update-index --chmod=+x path/to/file
 
-### 2. Mandatory Step for MacOS Monterey
+### 2. Mandatory Step for MacOS Montereyclea
 run below...
 ```sh
 sudo mkdir -p /etc/vbox/
 echo * 0.0.0.0/0 ::/0 | sudo tee -a /etc/vbox/networks.conf
 ```
-#### 2. Bootstrapping k8s cluster using kubeadm
-run below command to provision kubeadm cluster
+
+### 3. Checkout the Repo
+Clone the repo locally by running below command 
+  
+```sh 
+git clone the repo https://github.com/ramanagali/k8s-cluster-podman.git
+cd k8s-cluster-prometheus
+```
+
+### 4. Bootstrapping k8s cluster using kubeadm
+Run below command to provision new kubeadm cluster
 
 ```sh
 ./bootstrap.sh
 ```
 
-#### 3. Install k8s Ingress Controller, Prometheus 
+### 5. Install k8s Ingress Controller, Prometheus & Ingress resource 
+* Run below command to Install latest Ingress Controller, Prometheus using helm.  
+* It will deploy foo, bar (http-echo) services (as NodePort) along with Ingress Resource
+
 ```sh
 ./install-addons.sh
 ```
 
-NOTE: Wait 2-5mins to see ingress controller target healty
+**NOTE**: Wait 2-5mins to see ingress controller target healty
 
-#### 4. Access Ingress Controller Resource from browser
-run below commands to get the Ingress URL & open the URL in browser (Cmd/Ctrl + Click)
+### 6. Access Ingress Controller Resource from browser
+* Run below commands to get the Ingress URL 
+* Open the URL in browser (Cmd/Ctrl + Click)
 
 ```sh
 export NODE_IP=192.168.56.10
@@ -54,17 +64,7 @@ export ING_PORT=$(kubectl get svc my-ing-ingress-nginx-controller -o jsonpath="{
 echo "http://$NODE_IP:$ING_PORT/foo"
 echo "http://$NODE_IP:$ING_PORT/bar"
 ```
-#### 5. Run HTTP Benchmarking tests against foo, boor ingress resources
-Total HTTP Load test Duration is 1 min for each service
-* 1st strike - 100 connections, 30 seconds
-* 2nd strike - 200 connections, 40 seconds
-* 3rd strike - 400 connections, 40 seconds
-  
-```sh
-./loadtest.sh
-```
-
-#### 6. Access Prometheus Server from browser
+### 7. Access Prometheus Server from browser
 Run below commands to get the Prometheus Server URL & open the URL in browser (Cmd/Ctrl + Click)
 ```sh
 export NODE_IP=192.168.56.10
@@ -72,7 +72,17 @@ export PROM_PORT=$(kubectl get svc -n prometheus prometheus-kube-prometheus-prom
 echo "http://$NODE_IP:$PROM_PORT"
 ```
 
-##### 6.1 Queries Timeseries data to CSV
+### 8. Run HTTP Benchmarking tests against foo, boor ingress resources
+Total HTTP Load test - duration is 30 seconds for each service
+* 1st strike - 100 connections, 30 seconds for each service (foo & bar)
+* 2nd strike - 200 connections, 30 seconds for each service
+* 3rd strike - 400 connections, 30 seconds for each service
+  
+```sh
+./loadtest.sh
+```
+
+#### 8.1 Queries Timeseries data to CSV
 
 1. Average requests per second 
 ```sh
@@ -99,16 +109,16 @@ https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-select
 https://www.robustperception.io/prometheus-query-results-as-csv
 https://prometheus.io/docs/prometheus/latest/querying/api/#instant-queries
 
-##### 6.2 Export Timeseries data to CSV
+#### 8.2 Export Timeseries data to CSV
 
-#### 7. Stop k8s cluster
+#### 9. Stop k8s cluster
 
 ```sh
 vagrant halt
 ```
 NOTE: for strating the cluster refer [2. Bootstrapping](#2-bootstrapping-k8s-cluster-using-kubeadm)
 
-#### 4. Cleanup k8s cluster
+#### 10. Cleanup k8s cluster
 ```sh
 vagrant destroy -f
 ```
