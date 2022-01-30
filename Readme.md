@@ -91,14 +91,19 @@ echo $PROM_URL
 ```
 
 1. Average requests per second 
-`avg(rate(nginx_ingress_controller_nginx_process_requests_total[4h]))`
+```
+avg(rate(nginx_ingress_controller_nginx_process_requests_total[4h]))
+```
 
 2. Average memory usage per second
-`avg(rate(process_resident_memory_bytes{service="my-ing-ingress-nginx-controller-metrics"}[4h]))`
+```
+avg(rate(process_resident_memory_bytes{service="my-ing-ingress-nginx-controller-metrics"}[4h]))
+```
 
 3. Average CPU usage per second
-`avg(rate(process_cpu_seconds_total{service="my-ing-ingress-nginx-controller-metrics"}[4h]))`
-
+```
+avg(rate(process_cpu_seconds_total{service="my-ing-ingress-nginx-controller-metrics"}[4h]))
+```
 
 #### 8.2 Export Timeseries data to CSV
 ```
@@ -106,13 +111,19 @@ PROM_URL=http://$NODE_IP:$PROM_PORT:9090
 echo $PROM_URL
 ```
 1. Average requests per second 
-`curl -fs --data-urlencode 'query=avg(rate(nginx_ingress_controller_nginx_process_requests_total[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[] | .value[1]' > avg_req_ps.csv`
+```sh
+curl -fs --data-urlencode 'query=avg(rate(nginx_ingress_controller_nginx_process_requests_total[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[] | .value[1]' > avg_req_ps.csv
+```
 
 2. Average memory usage per second
-`curl -fs --data-urlencode 'query=avg(rate(process_resident_memory_bytes{service="my-ing-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]'  > avg_mem_ps.csv`
+```sh
+curl -fs --data-urlencode 'query=avg(rate(process_resident_memory_bytes{service="my-ing-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]'  > avg_mem_ps.csv
+```
 
 3. Average CPU usage per second
-`curl -fs --data-urlencode 'query=avg(rate(process_cpu_seconds_total{service="my-ing-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]' > > avg_cpu_ps.csv`
+```sh
+curl -fs --data-urlencode 'query=avg(rate(process_cpu_seconds_total{service="my-ing-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]' > > avg_cpu_ps.csv
+```
 
 
 #### 9. Stop k8s cluster
