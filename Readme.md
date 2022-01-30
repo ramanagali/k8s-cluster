@@ -56,8 +56,9 @@ echo "http://$NODE_IP:$ING_PORT/bar"
 ```
 #### 5. Run HTTP Benchmarking tests against foo, boor ingress resources
 Total HTTP Load test Duration is 1 min for each service
-* 1st strike - 200 connections, 30 seconds
-* 2nd strike - 400 connections, 40 seconds
+* 1st strike - 100 connections, 30 seconds
+* 2nd strike - 200 connections, 40 seconds
+* 3rd strike - 400 connections, 40 seconds
   
 ```sh
 ./loadtest.sh
