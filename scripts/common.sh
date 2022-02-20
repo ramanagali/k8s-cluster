@@ -91,6 +91,7 @@ sudo chmod o+r /etc/resolv.conf
 sudo sed -i 's/in\./us\./g' /etc/apt/sources.list
 sudo systemctl restart systemd-resolved
 
+# enable dmesg for debugging
 echo 'kernel.dmesg_restrict=0' | sudo tee -a /etc/sysctl.d/99-sysctl.conf
 sudo service procps restart
 
