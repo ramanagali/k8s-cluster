@@ -58,7 +58,7 @@ echo \
 
 #Install Docker Engine
 sudo apt-get update -y
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io 
 
 #Configure containerd
 sudo mkdir -p /etc/containerd
@@ -71,7 +71,7 @@ echo "ContainerD Runtime Configured Successfully"
 
 #Installing kubeadm, kubelet and kubectl
 sudo apt-get update -y 
-sudo apt-get install -y apt-transport-https ca-certificates curl
+sudo apt-get install -y apt-transport-https ca-certificates curl tree
 
 #Google Cloud public signing key
 sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg

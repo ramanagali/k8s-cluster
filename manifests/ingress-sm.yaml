@@ -2,32 +2,24 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"monitoring.coreos.com/v1","kind":"ServiceMonitor","metadata":{"annotations":{"meta.helm.sh/release-name":"my-ing","meta.helm.sh/release-namespace":"default"},"labels":{"app.kubernetes.io/component":"controller","app.kubernetes.io/instance":"my-ing","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"ingress-nginx","app.kubernetes.io/part-of":"ingress-nginx","release":"prometheus"},"name":"my-ing-ingress-nginx-controller","namespace":"default"},"spec":{"endpoints":[{"interval":"30s","port":"metrics"}],"namespaceSelector":{"matchNames":["default"]},"selector":{"matchLabels":{"app.kubernetes.io/component":"controller","app.kubernetes.io/instance":"my-ing","app.kubernetes.io/name":"ingress-nginx"}}}}
     meta.helm.sh/release-name: my-ing
     meta.helm.sh/release-namespace: default
-  creationTimestamp: "2022-01-30T10:11:08Z"
-  generation: 1
   labels:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: my-ing
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-    app.kubernetes.io/version: 1.1.1
-    helm.sh/chart: ingress-nginx-4.0.16
     release: prometheus
   name: my-ing-ingress-nginx-controller
   namespace: default
-  resourceVersion: "5747"
-  uid: 388d636b-7914-4895-9ee8-ec4c4f65f4a5
 spec:
   endpoints:
-  - interval: 30s
-    port: metrics
+    - interval: 30s
+      port: metrics
   namespaceSelector:
     matchNames:
-    - default
+      - default
   selector:
     matchLabels:
       app.kubernetes.io/component: controller
