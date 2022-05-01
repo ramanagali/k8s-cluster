@@ -41,7 +41,8 @@ helm upgrade -i prometheus prometheus-community/kube-prometheus-stack \
     --set prometheus.prometheusSpec.serviceMonitorSelector.matchLabels.release="prometheus" \
     --set alertmanager.enabled=false \
     --set kubeProxy.enabled=false \
-    --set grafana.enabled=false \
+    --set grafana.enabled=true \
+    --set grafana.service.type=NodePort \
     --set kubeControllerManager.enabled=false \
     --set kubeEtcd.enabled=false \
     --set kubeScheduler.enabled=false 

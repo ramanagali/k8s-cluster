@@ -9,7 +9,8 @@ Vagrant.configure("2") do |config|
         echo "nameserver 8.8.8.8" >> /etc/resolv.conf
         echo "nameserver 8.8.4.4" >> /etc/resolv.conf
     SHELL
-    config.vm.box = "bento/ubuntu-21.10"
+    # config.vm.box = "bento/ubuntu-21.10"
+    config.vm.box = "davekpatrick/ubuntu-2204"
     config.vm.box_check_update = true
 
     config.vm.define "master" do |master|
