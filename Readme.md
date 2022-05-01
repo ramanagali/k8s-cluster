@@ -64,15 +64,32 @@ export ING_PORT=$(kubectl get svc my-ing-ingress-nginx-controller -o jsonpath="{
 echo "http://$NODE_IP:$ING_PORT/foo"
 echo "http://$NODE_IP:$ING_PORT/bar"
 ```
+
 ### 7. Access Prometheus Server from browser
 Run below commands to get the Prometheus Server URL & open the URL in browser (Cmd/Ctrl + Click)
+```sh
+export NODE_IP=192.168.56.10
+export GRAFANA_PORT=$(kubectl get svc -n prometheus prometheus-grafana -o jsonpath="{.spec.ports[0].nodePort}")
+echo "http://$NODE_IP:$GRAFANA_PORT"
+```
+
+### 8. Access Grafana Server from browser
+Run below commands to get the Grafana Server URL & open the URL in browser (Cmd/Ctrl + Click)
 ```sh
 export NODE_IP=192.168.56.10
 export PROM_PORT=$(kubectl get svc -n prometheus prometheus-kube-prometheus-prometheus -o jsonpath="{.spec.ports[0].nodePort}")
 echo "http://$NODE_IP:$PROM_PORT"
 ```
 
-### 8. Run HTTP Benchmarking tests against foo, boor ingress resources
+**Grafana Credentials**
+```
+Username: admin
+Password: prom-operator
+```
+
+
+
+### 9. Run HTTP Benchmarking tests against foo, boor ingress resources
 Total HTTP Load test - duration is 30 seconds for each service
 * 1st strike - 100 connections, 30 seconds for each service (foo & bar)
 * 2nd strike - 200 connections, 30 seconds for each service
@@ -82,7 +99,7 @@ Total HTTP Load test - duration is 30 seconds for each service
 ./loadtest.sh
 ```
 
-#### 8.1 Queries Timeseries data to CSV
+#### 9.1 Queries Timeseries data to CSV
 Run Below commands in Prom server
 
 ```
