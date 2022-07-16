@@ -13,19 +13,19 @@ sudo kubeadm init --apiserver-advertise-address=$MASTER_IP  \
    --apiserver-cert-extra-sans=$MASTER_IP \
    --pod-network-cidr=$POD_CIDR --node-name $NODENAME \
    --ignore-preflight-errors Swap >> /root/kubeinit.log 2>/dev/null
-echo "kubeadm cluster initialization completed"
+echo "Kubeadm cluster initialization completed"
 
 # Install Calico Network Plugin
 sudo curl https://docs.projectcalico.org/manifests/calico.yaml -O
 sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f calico.yaml >/dev/null 2>&1
-echo "Install Calico Network Plugin"
+echo "Installed Calico Network Plugin"
 
 
 #copy kube config at home directory
 sudo mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
-echo "copy kube config at home directory"
+echo "Copued kube config at master node => .kube/config"
 
 # Save Configs to shared /Vagrant location
 # For Vagrant re-runs, check if there is existing configs in the location and delete it for saving new configuration.
@@ -36,23 +36,23 @@ if [ -d $config_path ]; then
 else
    mkdir -p /vagrant/configs
 fi
-echo "created folder /vagrant/configs"  
+echo "Created folder /vagrant/configs"  
 
 cp -i /etc/kubernetes/admin.conf /vagrant/configs/config
 touch /vagrant/configs/join.sh
 chmod +x /vagrant/configs/join.sh 
-echo "created and copied join.sh at /vagrant/configs/join.sh "      
+echo "Created and copied join.sh at /vagrant/configs/join.sh "      
 
 # Generete kubeadm join token
 sudo kubeadm token create --print-join-command > /vagrant/configs/join.sh 2>/dev/null
-echo "genereted kubeadm join token command"  
+echo "Genereted kubeadm join token command"  
 
 sudo -i -u vagrant bash << EOF
 mkdir -p /home/vagrant/.kube
 sudo cp -i /vagrant/configs/config /home/vagrant/.kube/
 sudo chown 1000:1000 /home/vagrant/.kube/config
 EOF
-echo "copied from /vagrant/configs/config to /home/vagrant/.kube/ "  
+echo "Copied from /vagrant/configs/config to /home/vagrant/.kube/ "  
 
 # Install Metrics Server
 # kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
