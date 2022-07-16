@@ -61,7 +61,7 @@ kubectl apply -f ./manifests/ingress-resource.yaml
 
 echo "*** Foo, Bar http-echo services & Ingress Resource Installed  ****"
 #------------------------------------------------------------------------------------
-kubectl create deploy netshoot --image nicolaka/netshoot -- - /bin/bash
+# kubectl create deploy netshoot --image nicolaka/netshoot -- - /bin/bash
 kubectl create deployment multitool --image=wbitt/network-multitool
 
 echo "***  troubleshooting Pods ****"
