@@ -1,6 +1,7 @@
 #! /bin/bash
 
-/bin/bash /vagrant/configs/join.sh -v
+/bin/bash /vagrant/configs/join.sh -v >/dev/null 2>&1
+echo "executed join.sh - node joined in the cluster "  
 
 sudo -i -u vagrant bash << EOF
 mkdir -p /home/vagrant/.kube
@@ -10,4 +11,4 @@ NODENAME=$(hostname -s)
 kubectl label node $(hostname -s) node-role.kubernetes.io/worker=worker-new
 EOF
 
-sudo swapoff -a && sudo systemctl daemon-reload && sudo systemctl restart kubelet
+# sudo swapoff -a && sudo systemctl daemon-reload && sudo systemctl restart kubelet

@@ -3,98 +3,81 @@
 # disable swap 
 sudo swapoff -a
 # keeps the swaf off during reboot
-sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+sed -i '/swap/d' /etc/fstab
 
-#Letting iptables see bridged traffic 
-lsmod | grep br_netfilter
-sudo modprobe br_netfilter
+# disable firewall
+systemctl disable --now ufw >/dev/null 2>&1
 
-cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
-br_netfilter
-EOF
-
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
-sudo sysctl --system
-
-# containerd
-cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
+# load the kernel modules
+cat >>/etc/modules-load.d/containerd.conf<<EOF
 overlay
 br_netfilter
 EOF
-
 sudo modprobe overlay
 sudo modprobe br_netfilter
+echo "loaded the kernel modules"
 
-# Setup required sysctl params, these persist across reboots.
-cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+# kernel settings Setup required sysctl params, these persist across reboots.
+cat >>/etc/sysctl.d/kubernetes.conf<<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables  = 1
 net.ipv4.ip_forward                 = 1
-net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
 # Apply sysctl params without reboot
-sudo sysctl --system
+sysctl --system >/dev/null 2>&1
+echo "kernel settings Setup required sysctl params, these persist across reboots"
 
-#Clean Install Docker Engine on Ubuntu
-sudo apt-get remove docker docker-engine docker.io containerd runc
-sudo apt-get update -y
-sudo apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg \
-    lsb-release
-
-#Add Docker’s official GPG key:
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
-#set up the stable repository
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-#Install Docker Engine
-sudo apt-get update -y
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io 
-
-#Configure containerd
-sudo mkdir -p /etc/containerd
-containerd config default | sudo tee /etc/containerd/config.toml
-
-#restart containerd
+# Install containerd 
+sudo apt update -qq >/dev/null 2>&1
+sudo apt install -qq -y containerd apt-transport-https >/dev/null 2>&1
+mkdir /etc/containerd
+sudo containerd config default > /etc/containerd/config.toml
+sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
 sudo systemctl restart containerd
-
+sudo systemctl enable containerd >/dev/null 2>&1
 echo "ContainerD Runtime Configured Successfully"
 
-#Installing kubeadm, kubelet and kubectl
-sudo apt-get update -y 
-sudo apt-get install -y apt-transport-https ca-certificates curl tree
-
-#Google Cloud public signing key
-sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-
 #Add Kubernetes apt repository
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - >/dev/null 2>&1
+sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main" >/dev/null 2>&1
+echo "Added Kubernetes apt repository"
 
 #Update apt package index, install kubelet, kubeadm and kubectl, and pin their version:
 sudo apt-get update -y
+sudo apt install -qq -y kubelet kubectl kubeadm >/dev/null 2>&1
+# sudo apt install -qq -y kubeadm=$VERSION kubelet=$VERSION kubectl=$VERSION >/dev/null 2>&1
+echo "Installed kubelet kubectl kubeadm"
 
-sudo apt-get install -y kubelet kubectl kubeadm
+echo 'vagrant ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers
+echo 'Defaults:vagrant !requiretty' | sudo tee -a /etc/sudoers
 
-sudo apt-mark hold kubelet kubeadm kubectl
 
-# extra
+<<com
+# enable ssh password authentication
+sed -i 's/^PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+systemctl reload sshd
+
+# set root password"
+echo -e "kubeadmin\nkubeadmin" | passwd root >/dev/null 2>&1
+echo "export TERM=xterm" >> /etc/bash.bashrc
+com
+
+# extra add sources
 sudo chmod o+r /etc/resolv.conf
 sudo sed -i 's/in\./us\./g' /etc/apt/sources.list
 sudo systemctl restart systemd-resolved
+echo "extra add sources"
 
 # enable dmesg for debugging
 echo 'kernel.dmesg_restrict=0' | sudo tee -a /etc/sysctl.d/99-sysctl.conf
 sudo service procps restart
+echo "enable dmesg for debugging"
 
+# added kubelet args to show actual ip address 
 KEA=Environment=\"KUBELET_EXTRA_ARGS=--node-ip=`ip addr show enp0s8 | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | head -1`\"
 sed -i "4 a $KEA" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 sudo systemctl daemon-reload && sudo systemctl restart kubelet
+echo "added kubelet args to show actual ip address"
+
