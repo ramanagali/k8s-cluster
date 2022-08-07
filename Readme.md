@@ -22,7 +22,7 @@
 * Install wrk http benchmarking tools using `brew install wrk`
   * https://github.com/wg/wrk
 
-### 2. Mandatory Step for MacOS Montereyclea
+### 2. Mandatory Step for MacOS Monterey
 Bun below...
 ```sh
 sudo mkdir -p /etc/vbox/
