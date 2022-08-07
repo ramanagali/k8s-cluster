@@ -84,4 +84,7 @@ sed -i "4 a $KEA" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 sudo systemctl daemon-reload && sudo systemctl restart kubelet
 echo "Added kubelet args to show actual ip address"
 
+# set default endpoint as containerd for crictl
+crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock
+
 # sudo swapoff -a && sudo systemctl daemon-reload && sudo systemctl restart kubelet

@@ -23,7 +23,7 @@ Vagrant.configure("2") do |config|
       master.vm.network "private_network", ip: IP_NW + "#{IP_START}"
       master.vm.provider "virtualbox" do |vb|
           #vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-          vb.memory = 4048
+          vb.memory = 4096
           vb.cpus = 2
       end
       master.vm.provision "shell", path: "scripts/common.sh"
