@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
 
     # master node ss
     config.vm.define "master" do |master|
-      master.vm.hostname = "master-node"
+      master.vm.hostname = "master"
       master.vm.network "private_network", ip: IP_NW + "#{IP_START}"
       master.vm.provider "virtualbox" do |vb|
           #vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -32,8 +32,8 @@ Vagrant.configure("2") do |config|
 
     # worker node 
     (1..NUM_WORKER_NODES).each do |i|
-      config.vm.define "node0#{i}" do |node|
-        node.vm.hostname = "worker-node0#{i}"
+      config.vm.define "worker#{i}" do |node|
+        node.vm.hostname = "worker#{i}"
         node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
         node.vm.provider "virtualbox" do |vb|
             #vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
