@@ -2,7 +2,7 @@
 
 MASTER_IP="192.168.56.10"
 NODENAME=$(hostname -s)
-POD_CIDR="192.168.0.0/16"
+POD_CIDR="100.64.0.0/16"
 
 # pull kubeadm images
 sudo kubeadm config images pull >/dev/null 2>&1
