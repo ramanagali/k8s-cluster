@@ -28,6 +28,7 @@ Vagrant.configure("2") do |config|
       end
       master.vm.provision "shell", path: "scripts/common.sh"
       master.vm.provision "shell", path: "scripts/master.sh"
+      master.vm.network :forwarded_port, guest: 6443, host: 6443, auto_correct: true
     end
 
     # worker node 
