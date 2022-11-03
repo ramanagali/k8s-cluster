@@ -7,7 +7,7 @@ helm repo update
 #helm show values ingress-nginx/ingress-nginx > ing_values.yaml
 
 #install k8s nginx ingress controller with metrics exposed for prometheus
-helm upgrade -i my-ing ingress-nginx/ingress-nginx \
+helm upgrade -i nginx ingress-nginx/ingress-nginx \
     --set controller.service.type=NodePort \
     --set controller.metrics.enabled=true \
     --set controller.metrics.serviceMonitor.enabled=true \
