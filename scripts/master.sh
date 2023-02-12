@@ -1,8 +1,6 @@
 #! /bin/bash
 
-MASTER_IP="192.168.56.10"
 NODENAME=$(hostname -s)
-POD_CIDR="100.64.0.0/16"
 
 # pull kubeadm images
 sudo kubeadm config images pull >/dev/null 2>&1
@@ -16,7 +14,7 @@ sudo kubeadm init --apiserver-advertise-address=$MASTER_IP  \
 echo "Kubeadm cluster initialization completed"
 
 # Install Calico Network Plugin
-sudo curl https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml -O
+sudo curl "https://raw.githubusercontent.com/projectcalico/calico/$CALICO_VERSION/manifests/calico.yaml" -O
 sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f calico.yaml >/dev/null 2>&1
 echo "Installed Calico Network Plugin"
 

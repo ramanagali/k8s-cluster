@@ -4,7 +4,6 @@ set -x
 set -euo pipefail
 #------------------------------------------------------------------------------------
 # spinup vagrant cluster
-vagrant box update
 vagrant up
 
 #copy the kubeconfig to local

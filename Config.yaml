@@ -1,0 +1,22 @@
+configs:
+  use: default
+  default:
+    box_name: bento/ubuntu-22.04
+    network:
+      ip_address : 192.168.56.
+      ip_start: 10
+      pod_cidr: 100.64.0.0/16
+      forward_port: 6443
+      dns_servers:
+        - 8.8.8.8
+        - 8.8.4.4
+    num_of_worker_nodes: 1
+    nodes:
+      master: 
+        cpu: 2
+        memory: 4096
+      worker: 
+        cpu: 1
+        memory: 2048
+    containerd_version: v1.26.0
+    calico_version: v3.25.0

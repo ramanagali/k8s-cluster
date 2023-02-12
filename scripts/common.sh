@@ -90,10 +90,9 @@ sudo systemctl daemon-reload && sudo systemctl restart kubelet
 echo "Added kubelet args to show actual ip address"
 
 # set default endpoint as containerd for crictl
-VERSION="v1.26.0"
-curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-${VERSION}-linux-amd64.tar.gz --output crictl-${VERSION}-linux-amd64.tar.gz
-sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
-rm -f crictl-$VERSION-linux-amd64.tar.gz
+curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/$CONTAINERD_VERSION/crictl-${CONTAINERD_VERSION}-linux-amd64.tar.gz --output crictl-${CONTAINERD_VERSION}-linux-amd64.tar.gz
+sudo tar zxvf crictl-$CONTAINERD_VERSION-linux-amd64.tar.gz -C /usr/local/bin
+rm -f crictl-$CONTAINERD_VERSION-linux-amd64.tar.gz
 sudo crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock
 
 # sudo swapoff -a && sudo systemctl daemon-reload && sudo systemctl restart kubelet
