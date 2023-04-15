@@ -18,5 +18,5 @@ configs:
       worker: 
         cpu: 1
         memory: 2048
-    containerd_version: v1.26.0
+    containerd_version: v1.26.1
     calico_version: v3.25.0
