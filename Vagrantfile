@@ -14,9 +14,10 @@ CONTROL_IP=IP_NW + "#{IP_START}"
 POD_CIDR=settings["network"]["pod_cidr"]
 FORWARD_PORT=settings['network']['forward_port']
 CONTAINERD_VERSION=settings['containerd_version']
+CRICTL_VERSION=settings['crictl_version']
 CALICO_VERSION=settings["calico_version"]
 DNS=settings["network"]["dns_servers"].join(" ")
-puts "{\n VM_BOX=#{VM_BOX},\n NUM_WORKER_NODES=#{NUM_WORKER_NODES},\n IP_NW=#{IP_NW},\n IP_START=#{IP_START},\n CONTROL_IP=#{CONTROL_IP},\n POD_CIDR=#{POD_CIDR},\n FORWARD_PORT=#{FORWARD_PORT}, \n CONTAINERD_VERSION=#{CONTAINERD_VERSION}, \n CALICO_VERSION=#{CALICO_VERSION}\n}"
+puts "{\n VM_BOX=#{VM_BOX},\n NUM_WORKER_NODES=#{NUM_WORKER_NODES},\n IP_NW=#{IP_NW},\n IP_START=#{IP_START},\n CONTROL_IP=#{CONTROL_IP},\n POD_CIDR=#{POD_CIDR},\n FORWARD_PORT=#{FORWARD_PORT}, \n CRICTL_VERSION=#{CRICTL_VERSION}, \n CALICO_VERSION=#{CALICO_VERSION}\n}"
 puts "--- Loaded Config.yaml Variables ---"
 
 Vagrant.configure("2") do |config|
@@ -44,7 +45,7 @@ Vagrant.configure("2") do |config|
           vb.memory = settings["nodes"]["master"]["memory"]
           vb.cpus = settings["nodes"]["master"]["cpu"]
       end
-      master.vm.provision "shell", env: {"CONTAINERD_VERSION" => CONTAINERD_VERSION},path: "scripts/common.sh"
+      master.vm.provision "shell", env: {"CRICTL_VERSION" => CRICTL_VERSION},path: "scripts/common.sh"
       master.vm.provision "shell", env: {
         "MASTER_IP" => CONTROL_IP,
         "POD_CIDR" => POD_CIDR,
@@ -63,7 +64,7 @@ Vagrant.configure("2") do |config|
             vb.memory = settings["nodes"]["worker"]["memory"]
           vb.cpus = settings["nodes"]["worker"]["cpu"]
         end
-        node.vm.provision "shell", env: {"CONTAINERD_VERSION" => CONTAINERD_VERSION},path: "scripts/common.sh"
+        node.vm.provision "shell", env: {"CRICTL_VERSION" => CRICTL_VERSION},path: "scripts/common.sh"
         node.vm.provision "shell", path: "scripts/node.sh"
       end
     end

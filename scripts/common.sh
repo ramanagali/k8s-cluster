@@ -37,8 +37,8 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt update
-sudo apt install -qq -y containerd.io apt-transport-https >/dev/null 2>&1
-mkdir /etc/containerd
+sudo apt install --allow-unauthenticated -qq -y containerd.io apt-transport-https ca-certificates >/dev/null 2>&1
+sudo mkdir -p /etc/containerd
 sudo containerd config default > /etc/containerd/config.toml
 sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
 sudo systemctl restart containerd
@@ -46,13 +46,13 @@ sudo systemctl enable containerd >/dev/null 2>&1
 echo "ContainerD Runtime Configured Successfully"
 
 #Add Kubernetes apt repository
-sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg >/dev/null 2>&1
+sudo curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg >/dev/null 2>&1
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list >/dev/null 2>&1
 echo "Added Kubernetes apt repository"
 
 #Update apt package index, install kubelet, kubeadm and kubectl, and pin their version:
-sudo apt-get update -y
-sudo apt install -qq -y kubelet kubectl kubeadm >/dev/null 2>&1
+sudo apt-get update --allow-unauthenticated --allow-insecure-repositories -y
+sudo apt install --allow-unauthenticated -qq -y kubelet kubectl kubeadm >/dev/null 2>&1
 #sudo apt install -qq -y kubeadm=$VERSION kubelet=1.25.5-00 kubectl=$VERSION >/dev/null 2>&1
 echo "Installed kubelet kubectl kubeadm"
 
@@ -90,9 +90,9 @@ sudo systemctl daemon-reload && sudo systemctl restart kubelet
 echo "Added kubelet args to show actual ip address"
 
 # set default endpoint as containerd for crictl
-curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/$CONTAINERD_VERSION/crictl-${CONTAINERD_VERSION}-linux-amd64.tar.gz --output crictl-${CONTAINERD_VERSION}-linux-amd64.tar.gz
-sudo tar zxvf crictl-$CONTAINERD_VERSION-linux-amd64.tar.gz -C /usr/local/bin
-rm -f crictl-$CONTAINERD_VERSION-linux-amd64.tar.gz
+curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/$CRICTL_VERSION/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz --output crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
+sudo tar zxvf crictl-$CRICTL_VERSION-linux-amd64.tar.gz -C /usr/local/bin
+rm -f crictl-$CRICTL_VERSION-linux-amd64.tar.gz
 sudo crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock
 
 # sudo swapoff -a && sudo systemctl daemon-reload && sudo systemctl restart kubelet
