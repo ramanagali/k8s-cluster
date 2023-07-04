@@ -1,7 +1,7 @@
 configs:
   use: default
   default:
-    box_name: bento/ubuntu-22.04
+    box_name: bento/ubuntu-23.04
     network:
       ip_address : 192.168.56.
       ip_start: 10
