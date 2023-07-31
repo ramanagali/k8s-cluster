@@ -3,7 +3,7 @@ configs:
   default:
     box_name: bento/ubuntu-23.04
     network:
-      ip_address : 192.168.56.
+      ip_address: 192.168.56.
       ip_start: 10
       pod_cidr: 100.64.0.0/16
       forward_port: 6443
@@ -12,12 +12,32 @@ configs:
         - 8.8.4.4
     num_of_worker_nodes: 1
     nodes:
-      master: 
+      master:
         cpu: 2
         memory: 4096
-      worker: 
+      worker:
         cpu: 1
         memory: 2048
-    containerd_version: 1.7.2-3
+    runtime: containerd
+    runtime_version: 1.7.2-3
     crictl_version: v1.27.0
-    calico_version: v3.26.0
+  crio_runtime:
+    box_name: bento/ubuntu-23.04
+    network:
+      ip_address: 192.168.56.
+      ip_start: 10
+      pod_cidr: 100.64.0.0/16
+      forward_port: 6443
+      dns_servers:
+        - 8.8.8.8
+        - 8.8.4.4
+    num_of_worker_nodes: 1
+    nodes:
+      master:
+        cpu: 2
+        memory: 4096
+      worker:
+        cpu: 1
+        memory: 2048
+    runtime: crio
+    runtime_version: 1.27

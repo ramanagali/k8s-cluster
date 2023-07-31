@@ -11,7 +11,7 @@ systemctl disable --now ufw >/dev/null 2>&1
 echo "Disable firewall"
 
 # load the kernel modules
-cat >>/etc/modules-load.d/containerd.conf<<EOF
+cat >>/etc/modules-load.d/kubernetes.conf<<EOF
 overlay
 br_netfilter
 EOF
@@ -28,22 +28,55 @@ EOF
 
 # Apply sysctl params without reboot
 sysctl --system >/dev/null 2>&1
+
+#verify the modules are loaded
+lsmod | grep br_netfilter
+lsmod | grep overlay
 echo "kernel settings setup required sysctl params, these persist across reboots"
 
-# Install containerd 
-sudo mkdir -p /etc/apt/keyrings
-sudo apt update -qq >/dev/null 2>&1
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install --allow-unauthenticated -qq -y containerd.io apt-transport-https ca-certificates >/dev/null 2>&1
-sudo mkdir -p /etc/containerd
-sudo containerd config default > /etc/containerd/config.toml
-sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
-sudo systemctl restart containerd
-sudo systemctl enable containerd >/dev/null 2>&1
-echo "ContainerD Runtime Configured Successfully"
+if [ "$RUNTIME" = "containerd" ]; 
+then
+  # Install containerd 
+  sudo apt update -qq >/dev/null 2>&1
+  sudo apt-get install ca-certificates curl gnupg
+  sudo mkdir -p /etc/apt/keyrings
+  sudo install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  sudo chmod a+r /etc/apt/keyrings/docker.gpg
+  echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt update 
+  sudo apt install --allow-unauthenticated -qq -y containerd.io apt-transport-https >/dev/null 2>&1
+  sudo mkdir -p /etc/containerd
+  sudo containerd config default > /etc/containerd/config.toml
+  sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+  
+  sudo systemctl restart containerd
+  sudo systemctl enable containerd >/dev/null 2>&1
+  sudo systemctl status containerd.service
+
+  echo "$RUNTIME Runtime $RUNTIME_VERSION Configured Successfully"
+elif [ "$RUNTIME" = "crio" ]; 
+then
+  # Install CRI-O
+  OS=xUbuntu_22.04
+  echo $RUNTIME_VERSION
+  echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+  echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$RUNTIME_VERSION/$OS/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$RUNTIME_VERSION.list
+  mkdir -p /usr/share/keyrings
+  curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-archive-keyring.gpg
+  curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$RUNTIME_VERSION/$OS/Release.key | gpg --dearmor -o /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
+  apt-get update
+  apt-get install cri-o cri-o-runc cri-tools -y
+
+  sudo systemctl start crio.service
+  sudo systemctl enable crio.service
+  sudo systemctl status crio.service
+
+  sudo crictl --version
+  echo "$RUNTIME Runtime $RUNTIME_VERSION Configured Successfully"
+fi
 
 #Add Kubernetes apt repository
 sudo curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg >/dev/null 2>&1
@@ -89,10 +122,27 @@ sed -i "4 a $KEA" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 sudo systemctl daemon-reload && sudo systemctl restart kubelet
 echo "Added kubelet args to show actual ip address"
 
-# set default endpoint as containerd for crictl
-curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/$CRICTL_VERSION/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz --output crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
-sudo tar zxvf crictl-$CRICTL_VERSION-linux-amd64.tar.gz -C /usr/local/bin
-rm -f crictl-$CRICTL_VERSION-linux-amd64.tar.gz
-sudo crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock
+if [ "$RUNTIME" = "containerd" ]; 
+then
+  # set download latest crictl
+  curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/latest/download/crictl-linux-amd64.tar.gz
+  sudo tar -zxvf crictl-linux-amd64.tar.gz -C /usr/local/bin
+  sudo rm -f crictl-linux-amd64.tar.gz
+  sudo crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock
+  sudo crictl --version
+fi
+
+# VERSION=$(curl -s https://api.github.com/repos/containerd/containerd/releases/latest | grep 'tag_name' | cut -d '"' -f 4)
+# sudo curl -L "https://github.com/containerd/containerd/releases/download/${VERSION}/containerd-${VERSION#v}-linux-amd64.tar.gz" -o containerd.tar.gz
+# sudo tar -xzf containerd.tar.gz
+# sudo mv bin/* /usr/local/bin/
+
+# sudo mkdir -p /etc/containerd
+# sudo curl -L "https://raw.githubusercontent.com/containerd/containerd/main/containerd-config.toml" -o /etc/containerd/config.toml
+
+# sudo systemctl start containerd
+# sudo systemctl enable containerd
+# sudo systemctl status containerd
+# sudo containerd --version
 
 # sudo swapoff -a && sudo systemctl daemon-reload && sudo systemctl restart kubelet

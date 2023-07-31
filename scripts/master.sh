@@ -13,11 +13,10 @@ sudo kubeadm init --apiserver-advertise-address=$MASTER_IP  \
    --ignore-preflight-errors Swap >> /root/kubeinit.log 2>/dev/null
 echo "Kubeadm cluster initialization completed"
 
-# Install Calico Network Plugin
-sudo curl "https://raw.githubusercontent.com/projectcalico/calico/$CALICO_VERSION/manifests/calico.yaml" -O
+# Install Latest Calico Network Plugin
+sudo curl -LO  https://docs.projectcalico.org/manifests/calico.yaml
 sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f calico.yaml >/dev/null 2>&1
-echo "Installed Calico Network Plugin"
-
+echo "Installed Latest Calico Network Plugin"
 
 #copy kube config at home directory
 sudo mkdir -p $HOME/.kube
