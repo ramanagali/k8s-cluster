@@ -3,7 +3,7 @@ require 'yaml'
 # Load settings from Config.yaml
 current_dir = File.dirname(File.expand_path(__FILE__))
 config_file = YAML.load_file("#{current_dir}/Config.yaml")
-settings = config_file['configs'][config_file['configs']['use']]
+settings = config_file['configs']
 
 # variables
 VM_BOX=settings['box_name']
@@ -13,9 +13,12 @@ IP_START=settings['network']['ip_start']
 CONTROL_IP=IP_NW + "#{IP_START}"
 POD_CIDR=settings["network"]["pod_cidr"]
 FORWARD_PORT=settings['network']['forward_port']
-RUNTIME=settings['runtime']
-RUNTIME_VERSION=settings['runtime_version']
 DNS=settings["network"]["dns_servers"].join(" ")
+
+cr_settings = config_file['configs'][config_file['configs']['use_runtime']]
+RUNTIME=settings['use_runtime']
+RUNTIME_VERSION=cr_settings['runtime_version']
+
 puts "{\n VM_BOX=#{VM_BOX},\n NUM_WORKER_NODES=#{NUM_WORKER_NODES},\n IP_NW=#{IP_NW},\n IP_START=#{IP_START},\n CONTROL_IP=#{CONTROL_IP},\n POD_CIDR=#{POD_CIDR},\n FORWARD_PORT=#{FORWARD_PORT}, \n RUNTIME=#{RUNTIME}, \n RUNTIME_VERSION=#{RUNTIME_VERSION}\n}"
 puts "--- Loaded Config.yaml Variables ---"
 

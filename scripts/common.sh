@@ -38,7 +38,7 @@ if [ "$RUNTIME" = "containerd" ];
 then
   # Install containerd 
   sudo apt update -qq >/dev/null 2>&1
-  sudo apt-get install ca-certificates curl gnupg
+  sudo apt-get install -y ca-certificates curl gnupg
   sudo mkdir -p /etc/apt/keyrings
   sudo install -m 0755 -d /etc/apt/keyrings
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -125,9 +125,12 @@ echo "Added kubelet args to show actual ip address"
 if [ "$RUNTIME" = "containerd" ]; 
 then
   # set download latest crictl
-  curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/latest/download/crictl-linux-amd64.tar.gz
-  sudo tar -zxvf crictl-linux-amd64.tar.gz -C /usr/local/bin
-  sudo rm -f crictl-linux-amd64.tar.gz
+  CTLVERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/cri-tools/releases/latest | grep "tag_name" | cut -d '"' -f 4)
+
+  sudo wget -q https://github.com/kubernetes-sigs/cri-tools/releases/download/$CTLVERSION/crictl-$CTLVERSION-linux-amd64.tar.gz
+  sudo tar zxvf crictl-$CTLVERSION-linux-amd64.tar.gz -C /usr/local/bin
+  rm -f crictl-$CTLVERSION-linux-amd64.tar.gz
+
   sudo crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock
   sudo crictl --version
 fi
