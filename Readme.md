@@ -60,7 +60,7 @@ Run below command to provision new kubeadm cluster
 
 ```sh
 export NODE_IP=192.168.56.10
-export ING_PORT=$(kubectl get svc my-ing-ingress-nginx-controller -o jsonpath="{.spec.ports[0].nodePort}")
+export ING_PORT=$(kubectl get svc nginx-ingress-nginx-controller -o jsonpath="{.spec.ports[0].nodePort}")
 echo "http://$NODE_IP:$ING_PORT/foo"
 echo "http://$NODE_IP:$ING_PORT/bar"
 ```
