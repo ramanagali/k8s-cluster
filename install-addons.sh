@@ -59,6 +59,11 @@ kubectl expose po bar --name bar-svc --port 5678
 kubectl apply -f ./manifests/ingress-resource.yaml
 # echo 192.168.56.10 learnwithgvr.com | sudo tee -a /etc/hosts
 
+export NODE_IP=192.168.56.10
+export ING_PORT=$(kubectl get svc nginx-ingress-nginx-controller -o jsonpath="{.spec.ports[0].nodePort}")
+echo "*** Exported NODE_IP = $NODE_IP, ING_PORT = $ING_PORT ****"
+
+
 echo "*** Foo, Bar http-echo services & Ingress Resource Installed  ****"
 #------------------------------------------------------------------------------------
 # kubectl create deploy netshoot --image nicolaka/netshoot -- - /bin/bash
