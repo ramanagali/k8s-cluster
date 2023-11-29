@@ -16,7 +16,7 @@
   * follow steps https://www.virtualbox.org/wiki/Downloads
 * Install vagrant using `brew install vagrant`
   * https://www.vagrantup.com/docs/installation
-* Install Helm `brew install helm`      
+* Install Helm and kubectl `brew install helm kubectl`      
   * https://helm.sh/docs/intro/install/
 * Install Go using https://go.dev/doc/install
 * Install wrk http benchmarking tools using `brew install wrk`
@@ -26,14 +26,14 @@
 Bun below...
 ```sh
 sudo mkdir -p /etc/vbox/
-echo * 0.0.0.0/0 ::/0 | sudo tee -a /etc/vbox/networks.conf
+echo '* 0.0.0.0/0 ::/0' | sudo tee -a /etc/vbox/networks.conf
 ```
 
 ### 3. Checkout the Repo
 Clone the repo locally by running below command 
   
 ```sh 
-git clone the repo https://github.com/ramanagali/k8s-cluster-podman.git
+git clone https://github.com/ramanagali/k8s-cluster-podman.git
 cd k8s-cluster-prometheus
 ```
 
@@ -114,12 +114,12 @@ avg(rate(nginx_ingress_controller_nginx_process_requests_total[4h]))
 
 2. Average memory usage per second
 ```
-avg(rate(process_resident_memory_bytes{service="my-ing-ingress-nginx-controller-metrics"}[4h]))
+avg(rate(process_resident_memory_bytes{service="nginx-ingress-nginx-controller-metrics"}[4h]))
 ```
 
 3. Average CPU usage per second
 ```
-avg(rate(process_cpu_seconds_total{service="my-ing-ingress-nginx-controller-metrics"}[4h]))
+avg(rate(process_cpu_seconds_total{service="nginx-ingress-nginx-controller-metrics"}[4h]))
 ```
 
 #### 8.2 Export Timeseries data to CSV
@@ -134,12 +134,12 @@ curl -fs --data-urlencode 'query=avg(rate(nginx_ingress_controller_nginx_process
 
 2. Average memory usage per second
 ```sh
-curl -fs --data-urlencode 'query=avg(rate(process_resident_memory_bytes{service="my-ing-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]'  > avg_mem_ps.csv
+curl -fs --data-urlencode 'query=avg(rate(process_resident_memory_bytes{service="nginx-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]'  > avg_mem_ps.csv
 ```
 
 3. Average CPU usage per second
 ```sh
-curl -fs --data-urlencode 'query=avg(rate(process_cpu_seconds_total{service="my-ing-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]' > > avg_cpu_ps.csv
+curl -fs --data-urlencode 'query=avg(rate(process_cpu_seconds_total{service="nginx-ingress-nginx-controller-metrics"}[4h]))' $PROM_URL/api/v1/query | jq -r '.data.result[].value[1]' > > avg_cpu_ps.csv
 ```
 
 
