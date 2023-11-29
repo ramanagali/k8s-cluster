@@ -16,7 +16,7 @@
   * follow steps https://www.virtualbox.org/wiki/Downloads
 * Install vagrant using `brew install vagrant`
   * https://www.vagrantup.com/docs/installation
-* Install Helm `brew install helm`      
+* Install Helm and kubectl `brew install helm kubectl`      
   * https://helm.sh/docs/intro/install/
 * Install Go using https://go.dev/doc/install
 * Install wrk http benchmarking tools using `brew install wrk`
@@ -26,14 +26,14 @@
 Bun below...
 ```sh
 sudo mkdir -p /etc/vbox/
-echo * 0.0.0.0/0 ::/0 | sudo tee -a /etc/vbox/networks.conf
+echo '* 0.0.0.0/0 ::/0' | sudo tee -a /etc/vbox/networks.conf
 ```
 
 ### 3. Checkout the Repo
 Clone the repo locally by running below command 
   
 ```sh 
-git clone the repo https://github.com/ramanagali/k8s-cluster-podman.git
+git clone https://github.com/ramanagali/k8s-cluster-podman.git
 cd k8s-cluster-prometheus
 ```
 
