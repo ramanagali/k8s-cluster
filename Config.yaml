@@ -20,4 +20,4 @@ configs:
   containerd:
     runtime_version: 1.7.12
   crio:
-    runtime_version: 1.29
+    runtime_version: 1.27
