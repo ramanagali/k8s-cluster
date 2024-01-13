@@ -43,6 +43,12 @@ Run below command to provision new kubeadm cluster
 ```sh
 ./bootstrap.sh
 ```
+---
+**NOTE:**
+If you are facing any errors in latest MacOS Sonama or latest, uninstall VirtualBox and re-install
+
+---
+
 
 ### 5. Install k8s Ingress Controller, Prometheus & Ingress resource 
 * Run below command to Install latest Ingress Controller, Prometheus using helm.  
