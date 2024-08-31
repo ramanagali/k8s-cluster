@@ -33,8 +33,8 @@ echo '* 0.0.0.0/0 ::/0' | sudo tee -a /etc/vbox/networks.conf
 Clone the repo locally by running below command 
   
 ```sh 
-git clone https://github.com/ramanagali/k8s-cluster-podman.git
-cd k8s-cluster-prometheus
+git clone https://github.com/ramanagali/k8s-cluster.git
+cd k8s-cluster
 ```
 
 ### 4. Bootstrapping k8s cluster using kubeadm

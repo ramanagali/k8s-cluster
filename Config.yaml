@@ -1,5 +1,5 @@
 configs:
-  box_name: bento/ubuntu-23.04
+  box_name: bento/ubuntu-24.04
   network:
     ip_address: 192.168.56.
     ip_start: 10
@@ -16,8 +16,8 @@ configs:
     worker:
       cpu: 1
       memory: 2048
-  use_runtime: containerd
+  use_runtime: crio
   containerd:
-    runtime_version: 1.7.12
+    runtime_version: 1.7.21
   crio:
-    runtime_version: 1.27
+    runtime_version: 1.28
