@@ -1,4 +1,5 @@
 configs:
+  cluster_name: K8SCluster
   box_name: bento/ubuntu-24.04
   network:
     ip_address: 192.168.56.
@@ -8,6 +9,8 @@ configs:
     dns_servers:
       - 8.8.8.8
       - 8.8.4.4
+      - 1.1.1.1
+  k8s_version: 1.31
   num_of_worker_nodes: 1
   nodes:
     master:
@@ -17,7 +20,7 @@ configs:
       cpu: 1
       memory: 2048
   use_runtime: crio
-  containerd:
-    runtime_version: 1.7.21
-  crio:
-    runtime_version: 1.28
+  # containerd:
+  #   runtime_version: auto
+  # crio:
+  #   runtime_version: auto

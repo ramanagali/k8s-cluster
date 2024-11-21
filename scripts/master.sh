@@ -3,19 +3,23 @@
 NODENAME=$(hostname -s)
 
 # pull kubeadm images
-sudo kubeadm config images pull >/dev/null 2>&1
+sudo kubeadm config images pull
 echo "Preflight Check Passed: Downloaded All Required Images"
 
 # initialize kubeadm cluster
 sudo kubeadm init --apiserver-advertise-address=$MASTER_IP  \
    --apiserver-cert-extra-sans=$MASTER_IP \
-   --pod-network-cidr=$POD_CIDR --node-name $NODENAME \
-   --ignore-preflight-errors Swap >> /root/kubeinit.log 2>/dev/null
+   --pod-network-cidr=$POD_CIDR \
+   --node-name $NODENAME \
+   --ignore-preflight-errors Swap
+
+#--service-cidr Default: "10.96.0.0/12"
+
 echo "Kubeadm cluster initialization completed"
 
 # Install Latest Calico Network Plugin
 sudo curl -LO  https://docs.projectcalico.org/manifests/calico.yaml
-sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f calico.yaml >/dev/null 2>&1
+sudo kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f calico.yaml
 echo "Installed Latest Calico Network Plugin"
 
 #copy kube config at home directory
@@ -35,13 +39,15 @@ else
 fi
 echo "Created folder /vagrant/configs"  
 
+# create join.sh file 
 cp -i /etc/kubernetes/admin.conf /vagrant/configs/config
 touch /vagrant/configs/join.sh
 chmod +x /vagrant/configs/join.sh 
 echo "Created and copied join.sh at /vagrant/configs/join.sh "      
 
 # Generete kubeadm join token
-sudo kubeadm token create --print-join-command > /vagrant/configs/join.sh 2>/dev/null
+sudo kubeadm token create --print-join-command > /vagrant/configs/join.sh
+sudo kubeadm token create --print-join-command > $config_path/join.sh
 echo "Genereted kubeadm join token command"  
 
 sudo -i -u vagrant bash << EOF
@@ -52,6 +58,6 @@ EOF
 echo "Copied from /vagrant/configs/config to /home/vagrant/.kube/ "  
 
 # Install Metrics Server
-# kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+# kubectl apply -f https://raw.githubusercontent.com/techiescamp/kubeadm-scripts/main/manifests/metrics-server.yaml
 # kubectl patch deployment metrics-server -n kube-system --type 'json' -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'
 
